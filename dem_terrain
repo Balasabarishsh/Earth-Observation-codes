@@ -1,0 +1,52 @@
+
+// ============================================
+// DEM TERRAIN ANALYSIS
+// ============================================
+
+var roi = ee.Geometry.Rectangle([78.0, 30.5, 79.0, 31.5]);
+
+Map.centerObject(roi, 9);
+
+// Load SRTM DEM
+var dem = ee.Image('USGS/SRTMGL1_003')
+  .select('elevation')
+  .clip(roi);
+
+// Terrain derivatives
+var terrain = ee.Terrain.products(dem);
+
+var slope = terrain.select('slope');
+var aspect = terrain.select('aspect');
+var hillshade = terrain.select('hillshade');
+
+// Elevation
+Map.addLayer(dem,
+  {min: 2000, max: 7000,
+   palette: ['blue', 'cyan', 'yellow', 'brown', 'white']},
+  'Elevation');
+
+// Slope
+Map.addLayer(slope,
+  {min: 0, max: 60,
+   palette: ['white', 'yellow', 'orange', 'red']},
+  'Slope');
+
+// Aspect
+Map.addLayer(aspect,
+  {min: 0, max: 360,
+   palette: ['red', 'yellow', 'green', 'cyan', 'blue']},
+  'Aspect');
+
+// Hillshade
+Map.addLayer(hillshade,
+  {min: 0, max: 255},
+  'Hillshade');
+
+// Export terrain derivatives
+Export.image.toDrive({
+  image: dem.addBands(slope).addBands(aspect),
+  description: 'DEM_Terrain_Parameters',
+  region: roi,
+  scale: 30,
+  maxPixels: 1e13
+});
