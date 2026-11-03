@@ -47,12 +47,11 @@ var s2Scale = 20;
 Map.centerObject(aoi, 9);
 
 Map.addLayer(
-  aoi.style({
+  aoi,{
     color: 'red',
     fillColor: '00000000',
     width: 2
-  }),
-  {},
+  },
   'Study Area'
 );
 
